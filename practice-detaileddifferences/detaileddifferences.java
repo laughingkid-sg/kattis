@@ -3,17 +3,15 @@ import java.util.Scanner;
 class detaileddifferences {
     public static void main(String[] args) {
         Kattio io = new Kattio(System.in, System.out);
-        Scanner s = new Scanner(System.in);
-        int n = s.nextInt();
-        s.nextLine();
+        int n = io.getInt();
         String next;
         while (n != 0) {
-            next = s.nextLine();
+            next = io.getLine();
             io.print(next);
             io.print("\n");
             char[] arr1 = next.toCharArray();
 
-            next = s.nextLine();
+            next = io.getLine();
             io.print(next);
             io.print("\n");
             char[] arr2 = next.toCharArray();
