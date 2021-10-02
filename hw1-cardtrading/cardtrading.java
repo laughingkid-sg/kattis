@@ -1,3 +1,9 @@
+/**
+  * Name: Goh Zheng Teck
+  * NUSNET ID: E0544321
+  * Lab Class: Lab 03
+*/
+
 import java.util.Arrays;
 import java.util.Comparator;
 
