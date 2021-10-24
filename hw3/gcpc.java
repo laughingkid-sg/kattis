@@ -2,7 +2,7 @@ class gcpc {
 	public static void main(String[] args) {
         
         final Kattio io = new Kattio(System.in, System.out);
-        BST rankedAbove = new BST();
+        AVL rankedAbove = new AVL();
         Team[] teams = new Team[io.getInt()];
         final int eventCount = io.getInt(); int teamNo;
         for (int i = 0; i < teams.length; i++)
@@ -14,7 +14,7 @@ class gcpc {
             if (teamNo == 0) /* If first team scores */ {
                 for (int j : rankedAbove.toArr()) {
 					if (favoriteTeam.compareTo(teams[j]) >= 0) // favoriteTeam overtake previous team
-                        rankedAbove.delete(j);
+                    rankedAbove.delete(j);
                 }
             }
             if (favoriteTeam.compareTo(teams[teamNo]) < 0) // favoriteTeam ranked below round winning team

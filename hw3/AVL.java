@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
-class BSTVertex {
+class AVLVertex {
 
-  public BSTVertex parent, left, right;
+  public AVLVertex parent, left, right;
   public int key;
   public int height;
   public int size; 
 
-  BSTVertex(int v) { 
+  AVLVertex(int v) { 
     key = v; 
     parent = left = right = null; 
     height = 0; 
@@ -15,36 +15,61 @@ class BSTVertex {
   }
 }
 
-class BST {
-  public BSTVertex root;
+class AVL {
+  public AVLVertex root;
   ArrayList<Integer> out;
 
-  public BST() { root = null; }
+  public AVL() { root = null; }
 
   public int size() {
     return size(root);
   }
 
-  public BSTVertex search(BSTVertex T, int v) {
+  public int size(AVLVertex T) {
+    if (T == null)
+        return 0;
+    return T.size;
+  }
+
+  public int height(AVLVertex T) {
+    if (T == null)
+        return -1;
+    return T.height;
+  }
+
+  public AVLVertex search(AVLVertex T, int v) {
     if (T == null)  return null;                     // not found
     else if (T.key == v) return T;                        // found
     else if (T.key < v)  return search(T.right, v);       // search to the right
     else                 return search(T.left, v);        // search to the left
   }
 
-  public int height(BSTVertex T) {
-    if (T == null)
-        return -1;
-    return T.height;
+  public int findMin(AVLVertex T) {
+    if (T.left == null) return T.key;                    // this is the min
+    else return findMin(T.left);           // go to the left
   }
 
-  public int size(BSTVertex T) {
-    if (T == null)
-        return 0;
-    return T.size;
+  public int successor(int v) { 
+    AVLVertex vPos = search(root, v);
+    return vPos == null ? -1 : successor(vPos);
   }
 
-  public int getBalance(BSTVertex T) {
+  public int successor(AVLVertex T) {
+    if (T.right != null)                       // this subtree has right subtree
+      return findMin(T.right);  // the successor is the minimum of right subtree
+    else {
+      AVLVertex par = T.parent;
+      AVLVertex cur = T;
+      // if par(ent) is not root and cur(rent) is its right children
+      while ((par != null) && (cur == par.right)) {
+        cur = par;                                         // continue moving up
+        par = cur.parent;
+      }
+      return par == null ? -1 : par.key;           // this is the successor of T
+    }
+  }
+
+  public int balanceFactor(AVLVertex T) {
     if (T == null)
         return 0;
     return height(T.left) - height(T.right);
@@ -54,18 +79,18 @@ class BST {
     root = insert(root, v); 
   }
 
-  public BSTVertex insert(BSTVertex T, int v) {
+  public AVLVertex insert(AVLVertex T, int v) {
     if (T == null) 
-      return new BSTVertex(v);
+      return new AVLVertex(v);
 
     if (T.key < v) { // search to the right
       T.right = insert(T.right, v);
       T.right.parent = T;
     }
-    else if (v > T.key) { //search to the left
+    else if (T.key > v) { //search to the left
       T.left = insert(T.left, v);
       T.left.parent = T;
-    } else return T;
+    } else return T; // unqiue case
 
     T.height = Math.max(height(T.left), height(T.right)) + 1;
 
@@ -73,7 +98,7 @@ class BST {
     T.size = size(T.left) + size(T.right) + 1;
 
     // Balance
-    int balance = getBalance(T);
+    int balance = balanceFactor(T);
 
     // 4 cases
     // Left-Left Case
@@ -99,8 +124,9 @@ class BST {
     return T;
   }
 
-  public BSTVertex rotateLeft(BSTVertex T) {
-    BSTVertex w = T.right;
+  public AVLVertex rotateLeft(AVLVertex T) {
+
+    AVLVertex w = T.right;
     w.parent = T.parent;
     T.parent = w;
     T.right = w.left;
@@ -117,8 +143,9 @@ class BST {
     return w;
   }
 
-  public BSTVertex rotateRight(BSTVertex T) {
-    BSTVertex w = T.left;
+  public AVLVertex rotateRight(AVLVertex T) {
+
+    AVLVertex w = T.left;
     w.parent = T.parent;
     T.parent = w;
     T.left = w.right;
@@ -135,37 +162,12 @@ class BST {
     return w;
   }
 
-  public int findMin(BSTVertex T) {
-    if (T.left == null) return T.key;                    // this is the min
-    else return findMin(T.left);           // go to the left
-  }
-
-  public int successor(int v) { 
-    BSTVertex vPos = search(root, v);
-    return vPos == null ? -1 : successor(vPos);
-  }
-
-  public int successor(BSTVertex T) {
-    if (T.right != null)                       // this subtree has right subtree
-      return findMin(T.right);  // the successor is the minimum of right subtree
-    else {
-      BSTVertex par = T.parent;
-      BSTVertex cur = T;
-      // if par(ent) is not root and cur(rent) is its right children
-      while ((par != null) && (cur == par.right)) {
-        cur = par;                                         // continue moving up
-        par = cur.parent;
-      }
-      return par == null ? -1 : par.key;           // this is the successor of T
-    }
-  }
-
   public void delete(int v) {
     if (root != null)
       root = delete(root, v);
   }
 
-  public BSTVertex delete(BSTVertex T, int v) {
+  public AVLVertex delete(AVLVertex T, int v) {
     if (T == null)  
       return T;              // cannot find the item to be deleted
     if (T.key < v)                                    // search to the right
@@ -196,23 +198,23 @@ class BST {
     T.height = Math.max(height(T.left), height(T.right)) + 1;
     T.size = size(T.left) + size(T.right) + 1;
 
-    int balance = getBalance(T);
+    int balance = balanceFactor(T);
 
-    if (balance > 1 && getBalance(T.left) >= 0)
+    if (balance > 1 && balanceFactor(T.left) >= 0)
       return rotateRight(T);
  
         // Left Right Case
-    if (balance > 1 && getBalance(T.left) < 0) {
+    if (balance > 1 && balanceFactor(T.left) < 0) {
       T.left = rotateLeft(T.left);
       return rotateRight(T);
     }
  
     // Right Right Case
-    if (balance < -1 && getBalance(T.right) <= 0)
+    if (balance < -1 && balanceFactor(T.right) <= 0)
       return rotateLeft(T);
 
     // Right Left Case
-    if (balance < -1 && getBalance(T.right) > 0) {
+    if (balance < -1 && balanceFactor(T.right) > 0) {
       T.right = rotateRight(T.right);
       return rotateLeft(T);
     }
@@ -226,28 +228,46 @@ class BST {
     return out;
   }
 
-  public void toArr(BSTVertex T) {
+  public void toArr(AVLVertex T) {
     if (T == null) return;
     toArr(T.left);
     out.add(T.key);
     toArr(T.right);
   }
 
+  public void inorder() { 
+    inorder(root);
+    System.out.println();
+  }
+
+  // helper method to perform inorder traversal
+  public void inorder(AVLVertex T) {
+    if (T == null) return;
+    inorder(T.left);                               // recursively go to the left
+    System.out.printf(" %d", T.key);                      // visit this BST node
+    inorder(T.right);                             // recursively go to the right
+  }
+
+  
   public static void main(String[] args) {
-    BST tree = new BST();
-    tree.insert(1);
-    tree.insert(2);
-    tree.insert(3);
-    tree.insert(4);
-    tree.insert(5);
-    tree.insert(6);
-
-    tree.delete(2);
-
+    AVL T = new AVL();
+    /*
     ArrayList<Integer> new1 = tree.toArr();
     for(int j : new1) {
-      //System.out.println(j);
-    }
+      System.out.println(j);
+    }*/
+
+    T.insert(15);
+    T.insert(23);
+    T.insert(6);
+    T.insert(71);
+    T.insert(50);
+    T.insert(4);
+    T.insert(7);
+    T.insert(5);
+
+
+    T.inorder(); 
   }
   
 }
