@@ -7,7 +7,7 @@ class AVLVertex {
   public int height;
   public int size; 
 
-  AVLVertex(int v) { 
+  AVLVertex(int v) {
     key = v; 
     parent = left = right = null; 
     height = 0; 

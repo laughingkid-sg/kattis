@@ -38,8 +38,8 @@ class Team implements Comparable<Team> {
 		this.score++;
 		this.penalty += penalty;
 	}
-
-	public int compareTo(Team team) {
+    
+    public int compareTo(Team team) {
 		if (this.score == team.score) 
 			return team.penalty - this.penalty;
 		return this.score - team.score;
